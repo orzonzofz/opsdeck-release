@@ -517,7 +517,7 @@ SHOW_MENU() {
       fi
       echo -e "${GREEN_COLOR}正在查看 OpsDeck 实时日志...${RES}"
       echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}\n"
-      journalctl -u opsdeck -f
+      journalctl -u opsdeck -n 50 -f --no-pager
       return 0
       ;;
     0)
