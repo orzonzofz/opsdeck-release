@@ -1,0 +1,95 @@
+########################################
+# Rust
+########################################
+/target
+Cargo.lock
+**/*.rs.bk
+*.pdb
+**/target/
+
+########################################
+# Python
+########################################
+venv/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenv (各种路径兼容)
+.env/
+.venv/
+env/
+venv/
+
+########################################
+# Vue / Node / Frontend
+########################################
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# 前端日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+########################################
+# IDE / 编辑器
+########################################
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+.DS_Store
+Thumbs.db
+
+########################################
+# 环境变量
+########################################
+.env
+.env.*
+!.env.example
+
+########################################
+# 数据库
+########################################
+*.db
+*.db-shm
+*.db-wal
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/logs/
+data/uploads/
+data123/
+
+# 但保留 data 目录结构
+!data/
+!data/plugins/
+!data/plugins/**
+########################################
+# 日志
+########################################
+*.log
+logs/
+
+########################################
+# 杂项
+########################################
+*.bak
+*.tmp
+backend-old-python
+frontend-dist
