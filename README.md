@@ -6,14 +6,15 @@
 
 ```bash
 # 拉取最新镜像
-docker pull ghcr.io/orzonzofz/opsdeck-release:latest
+docker pull xrbzy/opsdeck:latest
 
 # 运行容器
 docker run -d \
   --name opsdeck \
+  --pull=always \
   -p 13113:13113 \
   -v $(pwd)/data:/app/data \
-  ghcr.io/orzonzofz/opsdeck-release:latest
+  xrbzy/opsdeck:latest
 
 # 访问应用
 open http://localhost:13113
@@ -35,10 +36,10 @@ open http://localhost:13113
 ```bash
 # 下载脚本
 curl -O https://raw.githubusercontent.com/orzonzofz/opsdeck-release/main/opsdeck.sh
-chmod +x install.sh
+chmod +x opsdeck.sh
 
 # 运行交互式菜单
-sudo ./install.sh
+sudo ./opsdeck.sh
 ```
 
 交互菜单功能：
@@ -55,10 +56,10 @@ sudo ./install.sh
 
 ```bash
 # 安装到默认路径 /opt/opsdeck
-sudo ./install.sh opsdeck
+sudo ./opsdeck.sh install
 
 # 安装到自定义路径
-sudo ./install.sh opsdeck /usr/local
+sudo ./opsdeck.sh install /usr/local
 
 # 更新到最新版本
 sudo ./opsdeck.sh update
@@ -162,7 +163,7 @@ chmod +x opsdeck-linux-amd64-v1.0.0
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
-| `CHROME_PATH` | - | 浏览器路径（可选）<br>• 不设置时会自动下载 Chromium 到 `./data/browsers` 目录<br>• 也可以手动指定系统浏览器路径 |
+| `CHROME_PATH` | - | 浏览器路径（可选）<br>• 不设置时会自动检查系统是否安装浏览器，没有就下载 Chromium<br>• 也可以手动指定系统浏览器路径 |
 | `BROWSER_HEADLESS` | true | 浏览器模式<br>• true: 无头模式（后台运行，默认）<br>• false: 有头模式（显示窗口，用于调试） |
 | `BROWSER_ENABLE_IMAGES` | false | 图片加载<br>• true: 启用图片<br>• false: 禁用图片（默认，可提高性能） |
 | `BROWSER_WINDOW_WIDTH` | 1440 | 窗口宽度（有头模式时生效） |
@@ -190,7 +191,7 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=your-secure-password
 
 # 日志级别
-LOG_LEVEL=info
+RUST_LOG=opsdeck=info,sqlx=warn,tower_http=warn
 
 # 浏览器配置
 BROWSER_HEADLESS=true
