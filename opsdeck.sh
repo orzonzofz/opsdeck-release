@@ -196,6 +196,9 @@ INIT() {
     handle_error 1 "当前系统未安装 OpsDeck"
   fi
 
+  # 创建日志目录
+  mkdir -p /var/log/opsdeck
+  
   cat >/etc/systemd/system/opsdeck.service <<EOF
 [Unit]
 Description=OpsDeck service
@@ -206,11 +209,29 @@ After=network.target network.service
 Type=simple
 WorkingDirectory=$INSTALL_PATH
 ExecStart=$INSTALL_PATH/opsdeck
+StandardOutput=append:/var/log/opsdeck/opsdeck.log
+StandardError=append:/var/log/opsdeck/opsdeck.log
 KillMode=process
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
+EOF
+
+  # 配置日志轮转
+  cat >/etc/logrotate.d/opsdeck <<EOF
+/var/log/opsdeck/opsdeck.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0644 root root
+    postrotate
+        systemctl reload opsdeck >/dev/null 2>&1 || true
+    endscript
+}
 EOF
 
   systemctl daemon-reload
@@ -299,7 +320,7 @@ UNINSTALL() {
         handle_error 1 "未在 $INSTALL_PATH 找到 OpsDeck"
     fi
     
-    echo -e "${RED_COLOR}警告：卸载后将删除本地 OpsDeck 目录和数据库文件！${RES}"
+    echo -e "${RED_COLOR}警告：卸载后将删除本地 OpsDeck 目录、数据库文件和日志文件！${RES}"
     read -p "是否确认卸载？[Y/n]: " choice
     
     case "${choice:-y}" in
@@ -312,7 +333,9 @@ UNINSTALL() {
             
             echo -e "${GREEN_COLOR}删除 OpsDeck 文件${RES}"
             rm -rf $INSTALL_PATH
+            rm -rf /var/log/opsdeck
             rm -f /etc/systemd/system/opsdeck.service
+            rm -f /etc/logrotate.d/opsdeck
             systemctl daemon-reload
             
             echo -e "${GREEN_COLOR}OpsDeck 已完全卸载${RES}"
@@ -515,9 +538,29 @@ SHOW_MENU() {
         echo -e "\r\n${RED_COLOR}错误：系统未安装 OpsDeck，请先安装！${RES}\r\n"
         return 1
       fi
+      
+      local log_file="/var/log/opsdeck/opsdeck.log"
+      
+      if [ ! -f "$log_file" ]; then
+        echo -e "${YELLOW_COLOR}日志文件不存在，正在创建...${RES}"
+        mkdir -p /var/log/opsdeck 2>/dev/null
+        touch "$log_file" 2>/dev/null || {
+          echo -e "${RED_COLOR}无法创建日志文件，请使用 root 权限${RES}"
+          return 1
+        }
+        # 重启服务以应用日志配置
+        if systemctl is-active opsdeck >/dev/null 2>&1; then
+          echo -e "${YELLOW_COLOR}重启服务以启用日志文件...${RES}"
+          systemctl restart opsdeck
+          sleep 1
+        fi
+      fi
+      
       echo -e "${GREEN_COLOR}正在查看 OpsDeck 实时日志...${RES}"
-      echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}\n"
-      journalctl -u opsdeck -n 50 -f --no-pager
+      echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}"
+      echo -e "${YELLOW_COLOR}日志文件：$log_file${RES}\n"
+      
+      tail -f "$log_file"
       return 0
       ;;
     0)
