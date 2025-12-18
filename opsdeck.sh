@@ -560,7 +560,7 @@ SHOW_MENU() {
       echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}"
       echo -e "${YELLOW_COLOR}日志文件：$log_file${RES}\n"
       
-      tail -f "$log_file"
+      tail -n 20 -f "$log_file"
       return 0
       ;;
     0)
