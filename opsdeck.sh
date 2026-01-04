@@ -576,21 +576,11 @@ SHOW_MENU() {
         return 1
       fi
       
-      local log_file="/var/log/opsdeck/opsdeck.log"
+      local log_file="/data/logs/app.log.$(date +%Y-%m-%d)"
       
       if [ ! -f "$log_file" ]; then
-        echo -e "${YELLOW_COLOR}日志文件不存在，正在创建...${RES}"
-        mkdir -p /var/log/opsdeck 2>/dev/null
-        touch "$log_file" 2>/dev/null || {
-          echo -e "${RED_COLOR}无法创建日志文件，请使用 root 权限${RES}"
-          return 1
-        }
-        # 重启服务以应用日志配置
-        if systemctl is-active opsdeck >/dev/null 2>&1; then
-          echo -e "${YELLOW_COLOR}重启服务以启用日志文件...${RES}"
-          systemctl restart opsdeck
-          sleep 1
-        fi
+        echo -e "${RED_COLOR}日志文件不存在：$log_file${RES}"
+        return 1
       fi
       
       echo -e "${GREEN_COLOR}正在查看 OpsDeck 实时日志...${RES}"
