@@ -30,6 +30,35 @@ open http://localhost:13113
 - Root 权限
 - curl、tar 命令
 - x86_64 或 arm64 架构
+- **OpenCV 库**（验证码识别功能需要）
+
+### 安装 OpenCV 依赖
+
+使用二进制版本前，需要先安装 OpenCV 库：
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get update
+sudo apt-get install -y libopencv-dev
+```
+
+**CentOS/RHEL/Fedora:**
+```bash
+sudo yum install -y opencv opencv-devel
+# 或 Fedora
+sudo dnf install -y opencv opencv-devel
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S opencv
+```
+
+**macOS:**
+```bash
+brew install opencv
+```
+
 
 ### 交互式安装（推荐）
 
@@ -104,9 +133,8 @@ sudo journalctl -u opsdeck -f
 在 [Releases](https://github.com/orzonzofz/opsdeck-release/releases) 页面下载:
 
 - `opsdeck-linux-amd64-vX.X.X.tar.gz` - Linux x86_64
-- `opsdeck-linux-arm64-vX.X.X.tar.gz` - Linux ARM64  
+- `opsdeck-linux-arm64-vX.X.X.tar.gz` - Linux ARM64
 - `opsdeck-macos-arm64-vX.X.X.tar.gz` - macOS Apple Silicon
-- `opsdeck-windows-amd64-vX.X.X.zip` - Windows x64
 
 ### 快速使用
 
@@ -116,9 +144,6 @@ tar -xzf opsdeck-linux-amd64-v1.0.0.tar.gz
 chmod +x opsdeck-linux-amd64-v1.0.0
 ./opsdeck-linux-amd64-v1.0.0
 ```
-
-**Windows:**
-解压 zip 文件后双击运行 `opsdeck-windows-amd64-v1.0.0.exe`
 
 ## ⚙️ 环境变量配置
 
