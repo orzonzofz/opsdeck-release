@@ -109,22 +109,32 @@ elif ! command -v systemctl >/dev/null 2>&1; then
   exit 1
 fi
 
-# 等待 apt 锁释放
-wait_for_apt_lock() {
-  local max_wait=60
-  local waited=0
-  while fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-    if [ $waited -eq 0 ]; then
-      echo -e "${YELLOW_COLOR}等待其他 apt 进程完成...${RES}"
-    fi
+# 检查并终止占用 apt 锁的进程
+kill_apt_processes() {
+  # 查找占用 apt 锁的进程
+  local pids=$(lsof /var/lib/apt/lists/lock /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock 2>/dev/null | awk 'NR>1 {print $2}' | sort -u)
+  
+  if [ -z "$pids" ]; then
+    # 尝试用 fuser
+    pids=$(fuser /var/lib/apt/lists/lock /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock 2>/dev/null | tr ' ' '\n' | sort -u)
+  fi
+  
+  if [ -n "$pids" ]; then
+    echo -e "${YELLOW_COLOR}发现以下进程占用 apt 锁：${RES}"
+    for pid in $pids; do
+      local cmd=$(ps -p $pid -o comm= 2>/dev/null)
+      echo -e "  PID: $pid ($cmd)"
+    done
+    echo -e "${YELLOW_COLOR}正在终止这些进程...${RES}"
+    for pid in $pids; do
+      kill -9 $pid 2>/dev/null
+    done
     sleep 2
-    waited=$((waited + 2))
-    if [ $waited -ge $max_wait ]; then
-      echo -e "${RED_COLOR}等待 apt 锁超时${RES}"
-      return 1
-    fi
-  done
-  return 0
+    # 清理锁文件
+    rm -f /var/lib/apt/lists/lock /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock 2>/dev/null
+    dpkg --configure -a 2>/dev/null
+    echo -e "${GREEN_COLOR}✓ apt 锁已清理${RES}"
+  fi
 }
 
 # 检查并安装 OpenCV
@@ -140,7 +150,7 @@ CHECK_OPENCV() {
   # 检测包管理器并安装
   if command -v apt-get >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt-get)...${RES}"
-    wait_for_apt_lock || handle_error 1 "无法获取 apt 锁"
+    kill_apt_processes
     apt-get update && apt-get install -y libopencv-dev || handle_error 1 "OpenCV 安装失败"
   elif command -v yum >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
