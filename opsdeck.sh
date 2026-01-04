@@ -109,6 +109,40 @@ elif ! command -v systemctl >/dev/null 2>&1; then
   exit 1
 fi
 
+# 检查并安装 OpenCV
+CHECK_OPENCV() {
+  echo -e "${GREEN_COLOR}检查 OpenCV 依赖...${RES}"
+  
+  # 检查是否已安装 OpenCV
+  if ldconfig -p 2>/dev/null | grep -q libopencv; then
+    echo -e "${GREEN_COLOR}✓ OpenCV 已安装${RES}"
+    return 0
+  fi
+  
+  # 检测包管理器并安装
+  if command -v apt-get >/dev/null 2>&1; then
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt-get)...${RES}"
+    apt-get update && apt-get install -y libopencv-dev || handle_error 1 "OpenCV 安装失败"
+  elif command -v yum >/dev/null 2>&1; then
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
+    yum install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
+  elif command -v dnf >/dev/null 2>&1; then
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV (dnf)...${RES}"
+    dnf install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
+  elif command -v pacman >/dev/null 2>&1; then
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV (pacman)...${RES}"
+    pacman -S --noconfirm opencv || handle_error 1 "OpenCV 安装失败"
+  else
+    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV${RES}"
+    echo -e "Ubuntu/Debian: sudo apt-get install libopencv-dev"
+    echo -e "CentOS/RHEL:   sudo yum install opencv opencv-devel"
+    echo -e "Arch Linux:    sudo pacman -S opencv"
+    exit 1
+  fi
+  
+  echo -e "${GREEN_COLOR}✓ OpenCV 安装完成${RES}"
+}
+
 CHECK() {
   if [ ! -d "$(dirname "$INSTALL_PATH")" ]; then
     echo -e "${GREEN_COLOR}目录不存在，正在创建...${RES}"
@@ -211,6 +245,8 @@ WorkingDirectory=$INSTALL_PATH
 ExecStart=$INSTALL_PATH/opsdeck
 StandardOutput=append:/var/log/opsdeck/opsdeck.log
 StandardError=append:/var/log/opsdeck/opsdeck.log
+Environment="NO_COLOR=1"
+Environment="TERM=dumb"
 KillMode=process
 Restart=on-failure
 
@@ -368,6 +404,7 @@ SHOW_MENU() {
   case "$choice" in
     1)
       INSTALL_PATH='/opt/opsdeck'
+      CHECK_OPENCV
       CHECK
       INSTALL
       INIT
@@ -560,7 +597,8 @@ SHOW_MENU() {
       echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}"
       echo -e "${YELLOW_COLOR}日志文件：$log_file${RES}\n"
       
-      tail -n 20 -f "$log_file"
+      # 使用 sed 过滤 ANSI 颜色代码，确保显示纯文本
+      tail -n 20 -f "$log_file" | sed -u 's/\x1b\[[0-9;]*m//g'
       return 0
       ;;
     0)
@@ -586,6 +624,7 @@ if [ $# -eq 0 ]; then
     clear
   done
 elif [ "$1" = "install" ]; then
+  CHECK_OPENCV
   CHECK
   INSTALL
   INIT
