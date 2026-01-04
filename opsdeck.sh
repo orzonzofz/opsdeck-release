@@ -109,6 +109,24 @@ elif ! command -v systemctl >/dev/null 2>&1; then
   exit 1
 fi
 
+# 等待 apt 锁释放
+wait_for_apt_lock() {
+  local max_wait=60
+  local waited=0
+  while fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+    if [ $waited -eq 0 ]; then
+      echo -e "${YELLOW_COLOR}等待其他 apt 进程完成...${RES}"
+    fi
+    sleep 2
+    waited=$((waited + 2))
+    if [ $waited -ge $max_wait ]; then
+      echo -e "${RED_COLOR}等待 apt 锁超时${RES}"
+      return 1
+    fi
+  done
+  return 0
+}
+
 # 检查并安装 OpenCV
 CHECK_OPENCV() {
   echo -e "${GREEN_COLOR}检查 OpenCV 依赖...${RES}"
@@ -122,6 +140,7 @@ CHECK_OPENCV() {
   # 检测包管理器并安装
   if command -v apt-get >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt-get)...${RES}"
+    wait_for_apt_lock || handle_error 1 "无法获取 apt 锁"
     apt-get update && apt-get install -y libopencv-dev || handle_error 1 "OpenCV 安装失败"
   elif command -v yum >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
