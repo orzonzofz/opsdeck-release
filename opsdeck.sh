@@ -139,19 +139,25 @@ kill_apt_processes() {
 
 # 检查并安装 OpenCV
 CHECK_OPENCV() {
-  echo -e "${GREEN_COLOR}检查 OpenCV 4.5.x 依赖...${RES}"
+  echo -e "${GREEN_COLOR}检查 OpenCV 4.13 依赖...${RES}"
   
-  # 检查是否已安装 OpenCV
-  if ldconfig -p 2>/dev/null | grep -q libopencv; then
-    echo -e "${GREEN_COLOR}✓ OpenCV 已安装${RES}"
+  # 检查是否已安装 OpenCV 4.13
+  if ldconfig -p 2>/dev/null | grep -q libopencv && [ -f /usr/include/opencv4/opencv2.hpp ]; then
+    echo -e "${GREEN_COLOR}✓ OpenCV 4.13 已安装${RES}"
     return 0
   fi
   
   # 检测包管理器并安装
   if command -v apt-get >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt-get)...${RES}"
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV 4.13 (官方源)...${RES}"
     kill_apt_processes
-    apt-get update && apt-get install -y libopencv-dev libopencv-contrib-dev || handle_error 1 "OpenCV 安装失败"
+    
+    # 添加 OpenCV 官方源
+    echo -e "${GREEN_COLOR}添加 OpenCV 官方源...${RES}"
+    wget -O /etc/apt/trusted.gpg.d/opencv.gpg https://packages.opencv.org/key/GPG-KEY-opencv 2>/dev/null
+    echo "deb https://packages.opencv.org/apt/ubuntu noble main" > /etc/apt/sources.list.d/opencv.list
+    
+    apt-get update && apt-get install -y libopencv-dev=4.13.0+dfsg-1 libopencv-contrib-dev=4.13.0+dfsg-1 || handle_error 1 "OpenCV 4.13 安装失败"
   elif command -v yum >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
     yum install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
@@ -162,14 +168,14 @@ CHECK_OPENCV() {
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (pacman)...${RES}"
     pacman -S --noconfirm opencv || handle_error 1 "OpenCV 安装失败"
   else
-    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV 4.5.x${RES}"
-    echo -e "Ubuntu/Debian: sudo apt-get install libopencv-dev libopencv-contrib-dev"
-    echo -e "CentOS/RHEL:   sudo yum install opencv opencv-devel"
-    echo -e "Arch Linux:    sudo pacman -S opencv"
+    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV 4.13${RES}"
+    echo -e "Ubuntu 22.04/24.04: 先添加官方源，然后安装 libopencv-dev=4.13.0+dfsg-1"
+    echo -e "CentOS/RHEL:       sudo yum install opencv opencv-devel"
+    echo -e "Arch Linux:        sudo pacman -S opencv"
     exit 1
   fi
   
-  echo -e "${GREEN_COLOR}✓ OpenCV 安装完成${RES}"
+  echo -e "${GREEN_COLOR}✓ OpenCV 4.13 安装完成${RES}"
 }
 
 CHECK() {
