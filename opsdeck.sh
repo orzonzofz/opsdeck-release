@@ -605,7 +605,7 @@ SHOW_MENU() {
         return 1
       fi
       
-      local log_file="/data/logs/app.log.$(date +%Y-%m-%d)"
+      local log_file="$INSTALL_PATH/data/logs/app.log.$(date +%Y-%m-%d)"
       
       if [ ! -f "$log_file" ]; then
         echo -e "${RED_COLOR}日志文件不存在：$log_file${RES}"
@@ -616,8 +616,7 @@ SHOW_MENU() {
       echo -e "${YELLOW_COLOR}提示：按 Ctrl+C 退出日志查看${RES}"
       echo -e "${YELLOW_COLOR}日志文件：$log_file${RES}\n"
       
-      # 使用 sed 过滤 ANSI 颜色代码，确保显示纯文本
-      tail -n 20 -f "$log_file" | sed -u 's/\x1b\[[0-9;]*m//g'
+      tail -n 20 -f "$log_file"
       return 0
       ;;
     0)
