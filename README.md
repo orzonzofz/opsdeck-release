@@ -30,16 +30,16 @@ open http://localhost:13113
 - Root 权限
 - curl、tar 命令
 - x86_64 或 arm64 架构
-- **OpenCV 库**（验证码识别功能需要）
+- **OpenCV 4.5.x**（验证码识别功能需要）
 
 ### 安装 OpenCV 依赖
 
-使用二进制版本前，需要先安装 OpenCV 库：
+使用二进制版本前，需要先安装 OpenCV 4.5.x 库：
 
 **Ubuntu/Debian:**
 ```bash
 sudo apt-get update
-sudo apt-get install -y libopencv-dev
+sudo apt-get install -y libopencv-dev libopencv-contrib-dev
 ```
 
 **CentOS/RHEL/Fedora:**
