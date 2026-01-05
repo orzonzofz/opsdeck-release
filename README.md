@@ -30,16 +30,17 @@ open http://localhost:13113
 - Root 权限
 - curl、tar 命令
 - x86_64 或 arm64 架构
-- **OpenCV 4.5.x**（验证码识别功能需要）
+- **OpenCV 4.13**（验证码识别功能需要）
 
 ### 安装 OpenCV 依赖
 
-使用二进制版本前，需要先安装 OpenCV 4.5.x 库：
+使用二进制版本前，需要先安装 OpenCV 4.13 库：
 
-**Ubuntu/Debian:**
+**Ubuntu 22.04/24.04 (官方源安装 4.13):**
 ```bash
-sudo apt-get update
-sudo apt-get install -y libopencv-dev libopencv-contrib-dev
+wget -O /etc/apt/trusted.gpg.d/opencv.gpg https://packages.opencv.org/key/GPG-KEY-opencv
+echo "deb https://packages.opencv.org/apt/ubuntu noble main" | sudo tee /etc/apt/sources.list.d/opencv.list
+sudo apt-get update && sudo apt-get install -y libopencv-dev=4.13.0+dfsg-1
 ```
 
 **CentOS/RHEL/Fedora:**
