@@ -139,7 +139,7 @@ kill_apt_processes() {
 
 # 检查并安装 OpenCV
 CHECK_OPENCV() {
-  echo -e "${GREEN_COLOR}检查 OpenCV 依赖...${RES}"
+  echo -e "${GREEN_COLOR}检查 OpenCV 4.5.x 依赖...${RES}"
   
   # 检查是否已安装 OpenCV
   if ldconfig -p 2>/dev/null | grep -q libopencv; then
@@ -151,7 +151,7 @@ CHECK_OPENCV() {
   if command -v apt-get >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt-get)...${RES}"
     kill_apt_processes
-    apt-get update && apt-get install -y libopencv-dev || handle_error 1 "OpenCV 安装失败"
+    apt-get update && apt-get install -y libopencv-dev libopencv-contrib-dev || handle_error 1 "OpenCV 安装失败"
   elif command -v yum >/dev/null 2>&1; then
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
     yum install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
@@ -162,8 +162,8 @@ CHECK_OPENCV() {
     echo -e "${YELLOW_COLOR}正在安装 OpenCV (pacman)...${RES}"
     pacman -S --noconfirm opencv || handle_error 1 "OpenCV 安装失败"
   else
-    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV${RES}"
-    echo -e "Ubuntu/Debian: sudo apt-get install libopencv-dev"
+    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV 4.5.x${RES}"
+    echo -e "Ubuntu/Debian: sudo apt-get install libopencv-dev libopencv-contrib-dev"
     echo -e "CentOS/RHEL:   sudo yum install opencv opencv-devel"
     echo -e "Arch Linux:    sudo pacman -S opencv"
     exit 1
