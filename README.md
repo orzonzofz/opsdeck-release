@@ -29,10 +29,10 @@ open http://localhost:13113
 ```yaml
 services:
   opsdeck:
-    image: ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
+    image: xrbzy/opsdeck:latest
     container_name: opsdeck
     ports:
-      - \"13113:13113\"
+      - "13113:13113"
     volumes:
       - ./data:/app/data
     restart: unless-stopped
