@@ -2,7 +2,14 @@
 
 预编译的 OpsDeck 二进制文件和 Docker 镜像发布仓库。
 
-## 📦 使用 Docker 镜像 (推荐)
+## 🐳 使用 Docker 镜像 (推荐)
+
+\`\`\`bash
+docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:${VERSION}
+docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
+\`\`\`
+
+### 📝 Docker CLI 直接运行
 
 ```bash
 # 拉取最新镜像
@@ -19,6 +26,28 @@ docker run -d \
 # 访问应用
 open http://localhost:13113
 ```
+
+### 📝 Docker Compose 配置
+
+创建 \`docker-compose.yml\`：
+
+\`\`\`yaml
+services:
+  opsdeck:
+    image: ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
+    container_name: opsdeck
+    ports:
+      - \"13113:13113\"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+\`\`\`
+
+运行：
+
+\`\`\`bash
+docker-compose up -d
+\`\`\`" \
 
 ## 🚀 Linux 一键安装脚本
 
