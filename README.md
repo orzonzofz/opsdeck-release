@@ -4,10 +4,10 @@
 
 ## 🐳 使用 Docker 镜像 (推荐)
 
-\`\`\`bash
+```bash
 docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:${VERSION}
 docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
-\`\`\`
+```
 
 ### 📝 Docker CLI 直接运行
 
@@ -31,7 +31,7 @@ open http://localhost:13113
 
 创建 \`docker-compose.yml\`：
 
-\`\`\`yaml
+```yaml
 services:
   opsdeck:
     image: ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
@@ -41,13 +41,13 @@ services:
     volumes:
       - ./data:/app/data
     restart: unless-stopped
-\`\`\`
+```
 
 运行：
 
-\`\`\`bash
+```bash
 docker-compose up -d
-\`\`\`" \
+```
 
 ## 🚀 Linux 一键安装脚本
 
