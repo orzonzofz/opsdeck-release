@@ -4,11 +4,6 @@
 
 ## 🐳 使用 Docker 镜像 (推荐)
 
-```bash
-docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:${VERSION}
-docker pull ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME}:latest
-```
-
 ### 📝 Docker CLI 直接运行
 
 ```bash
