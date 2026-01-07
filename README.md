@@ -33,53 +33,6 @@ open http://localhost:13113
 - **OpenCV 4.6**（验证码识别功能需要）
 - **Chromium 浏览器**（自动化任务需要）
 
-### 安装系统依赖
-
-使用二进制版本前，需要先安装以下依赖：
-
-#### 安装 Chromium 浏览器
-
-**Ubuntu / Debian:**
-```bash
-sudo apt-get update && sudo apt-get install -y chromium-browser
-```
-
-**CentOS/RHEL/Fedora:**
-```bash
-sudo yum install -y chromium
-# 或 Fedora
-sudo dnf install -y chromium
-```
-
-**Arch Linux:**
-```bash
-sudo pacman -S chromium
-```
-
-#### 安装 OpenCV 4.6
-
-**Ubuntu / Debian (系统默认源):**
-```bash
-sudo apt-get install -y libopencv-dev libopencv-contrib-dev
-```
-
-**CentOS/RHEL/Fedora:**
-```bash
-sudo yum install -y opencv opencv-devel
-# 或 Fedora
-sudo dnf install -y opencv opencv-devel
-```
-
-**Arch Linux:**
-```bash
-sudo pacman -S opencv
-```
-
-**macOS:**
-```bash
-brew install opencv
-```
-
 
 ### 交互式安装（推荐）
 
@@ -156,6 +109,53 @@ sudo journalctl -u opsdeck -f
 - `opsdeck-linux-amd64-vX.X.X.tar.gz` - Linux x86_64
 - `opsdeck-linux-arm64-vX.X.X.tar.gz` - Linux ARM64
 - `opsdeck-macos-arm64-vX.X.X.tar.gz` - macOS Apple Silicon
+
+### 安装系统依赖
+
+使用二进制版本前，需要先安装以下依赖：
+
+#### 安装 Chromium 浏览器
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get update && sudo apt-get install -y chromium-browser
+```
+
+**CentOS/RHEL/Fedora:**
+```bash
+sudo yum install -y chromium
+# 或 Fedora
+sudo dnf install -y chromium
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S chromium
+```
+
+#### 安装 OpenCV
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get install -y libopencv-dev libopencv-contrib-dev
+```
+
+**CentOS/RHEL/Fedora:**
+```bash
+sudo yum install -y opencv opencv-devel
+# 或 Fedora
+sudo dnf install -y opencv opencv-devel
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S opencv
+```
+
+**macOS:**
+```bash
+brew install opencv
+```
 
 ### 快速使用
 
