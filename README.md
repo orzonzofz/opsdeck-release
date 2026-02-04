@@ -15,6 +15,8 @@ docker run -d \
   --name opsdeck \
   --pull=always \
   -p 13113:13113 \
+  --log-opt max-size=10m \
+  --log-opt max-file=7 \
   -v $(pwd)/data:/app/data \
   xrbzy/opsdeck:latest
 
@@ -35,6 +37,11 @@ services:
       - "13113:13113"
     volumes:
       - ./data:/app/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "7"
     restart: unless-stopped
 ```
 
