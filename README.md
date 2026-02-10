@@ -13,6 +13,7 @@ docker pull xrbzy/opsdeck:latest
 # 运行容器
 docker run -d \
   --name opsdeck \
+  --init \
   --pull=always \
   -p 13113:13113 \
   --log-opt max-size=10m \
@@ -33,6 +34,7 @@ services:
   opsdeck:
     image: xrbzy/opsdeck:latest
     container_name: opsdeck
+    init: true
     ports:
       - "13113:13113"
     volumes:
