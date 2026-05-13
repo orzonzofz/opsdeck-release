@@ -41,6 +41,10 @@ GREEN_COLOR='\e[1;32m'
 YELLOW_COLOR='\e[1;33m'
 RES='\e[0m'
 
+DISTRO_ID=""
+DISTRO_VERSION_ID=""
+SUPPORTED_INSTALL_HOST=false
+
 # 获取已安装路径
 GET_INSTALLED_PATH() {
     if [ -f "/etc/systemd/system/opsdeck.service" ]; then
@@ -108,6 +112,39 @@ elif ! command -v systemctl >/dev/null 2>&1; then
   echo -e "\r\n${RED_COLOR}出错了${RES}，无法确定你当前的 Linux 发行版。\r\n建议手动安装。\r\n"
   exit 1
 fi
+
+detect_linux_distribution() {
+  if [ -r /etc/os-release ]; then
+    DISTRO_ID=$(sed -n 's/^ID=//p' /etc/os-release | tr -d '"')
+    DISTRO_VERSION_ID=$(sed -n 's/^VERSION_ID=//p' /etc/os-release | tr -d '"')
+  fi
+
+  if [ "$DISTRO_ID" = "debian" ] && [ "$DISTRO_VERSION_ID" = "12" ]; then
+    SUPPORTED_INSTALL_HOST=true
+    return
+  fi
+
+  if [ "$DISTRO_ID" = "ubuntu" ] && [ "$DISTRO_VERSION_ID" = "24.04" ]; then
+    SUPPORTED_INSTALL_HOST=true
+    return
+  fi
+
+  SUPPORTED_INSTALL_HOST=false
+}
+
+require_supported_install_host() {
+  if [ "$SUPPORTED_INSTALL_HOST" = true ]; then
+    return 0
+  fi
+
+  local host_desc="${DISTRO_ID:-unknown}${DISTRO_VERSION_ID:+ ${DISTRO_VERSION_ID}}"
+  echo -e "\r\n${RED_COLOR}错误：当前一键安装脚本仅支持 Debian 12 / Ubuntu 24.04 直装${RES}"
+  echo -e "当前系统：${YELLOW_COLOR}${host_desc}${RES}"
+  echo -e "建议改用 ${GREEN_COLOR}xrbzy/opsdeck${RES} Docker 镜像部署。\r\n"
+  exit 1
+}
+
+detect_linux_distribution
 
 # 检查并终止占用 apt 锁的进程
 kill_apt_processes() {
@@ -437,6 +474,7 @@ SHOW_MENU() {
   case "$choice" in
     1)
       INSTALL_PATH='/opt/opsdeck'
+      require_supported_install_host
       CHECK_OPENCV
       CHECK
       INSTALL
@@ -646,12 +684,14 @@ if [ $# -eq 0 ]; then
     clear
   done
 elif [ "$1" = "install" ]; then
+  require_supported_install_host
   CHECK_OPENCV
   CHECK
   INSTALL
   INIT
   SUCCESS
 elif [ "$1" = "update" ]; then
+  require_supported_install_host
   if [ $# -gt 1 ]; then
     echo -e "${RED_COLOR}错误：update 命令不需要指定路径${RES}"
     echo -e "正确用法: $0 update"

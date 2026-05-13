@@ -56,6 +56,7 @@ docker-compose up -d
 ## 🚀 Linux 一键安装脚本
 
 适用于 Linux 系统的自动化安装脚本，支持 systemd 服务管理。
+当前仅支持 `Debian 12` 和 `Ubuntu 24.04` 直装；其它系统版本或架构建议直接使用 Docker。
 
 ### 系统要求
 
