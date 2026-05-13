@@ -163,71 +163,17 @@ CHECK_OPENCV() {
   
   # 检测包管理器并安装
   if command -v apt-get >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 OpenCV 4.6 (系统源)...${RES}"
+    echo -e "${YELLOW_COLOR}正在安装 OpenCV (apt)...${RES}"
     kill_apt_processes
-    
-    # 直接使用系统默认源安装 OpenCV 4.6
-    # Ubuntu 22.04/24.04 默认源中包含 OpenCV 4.6
-    apt-get update && apt-get install -y libopencv-dev libopencv-contrib-dev || handle_error 1 "OpenCV 安装失败"
-  elif command -v yum >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 OpenCV (yum)...${RES}"
-    yum install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
-  elif command -v dnf >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 OpenCV (dnf)...${RES}"
-    dnf install -y opencv opencv-devel || handle_error 1 "OpenCV 安装失败"
-  elif command -v pacman >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 OpenCV (pacman)...${RES}"
-    pacman -S --noconfirm opencv || handle_error 1 "OpenCV 安装失败"
+
+    apt-get update && apt-get install -y libopencv-dev || handle_error 1 "OpenCV 安装失败"
   else
-    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 OpenCV 4.6${RES}"
-    echo -e "Ubuntu 22.04/24.04: sudo apt-get install -y libopencv-dev libopencv-contrib-dev"
-    echo -e "CentOS/RHEL:       sudo yum install opencv opencv-devel"
-    echo -e "Arch Linux:        sudo pacman -S opencv"
+    echo -e "${RED_COLOR}错误：当前一键安装脚本仅支持 Debian 12 / Ubuntu 24.04 的 apt 环境${RES}"
+    echo -e "其它系统版本或架构建议直接使用 Docker 镜像。"
     exit 1
   fi
   
   echo -e "${GREEN_COLOR}✓ OpenCV 4.6 安装完成${RES}"
-}
-
-# 检查并安装 Chromium 浏览器
-CHECK_CHROMIUM() {
-  echo -e "${GREEN_COLOR}检查 Chromium 浏览器...${RES}"
-  
-  # 检查是否已安装 Chromium
-  if command -v chromium &> /dev/null; then
-    echo -e "${GREEN_COLOR}✓ Chromium 已安装${RES}"
-    return 0
-  fi
-  
-  if command -v chromium-browser &> /dev/null; then
-    echo -e "${GREEN_COLOR}✓ Chromium 已安装${RES}"
-    return 0
-  fi
-  
-  # 检测包管理器并安装
-  if command -v apt-get >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 Chromium (apt)...${RES}"
-    kill_apt_processes
-    
-    apt-get update && apt-get install -y chromium-browser || handle_error 1 "Chromium 安装失败"
-  elif command -v yum >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 Chromium (yum)...${RES}"
-    yum install -y chromium || handle_error 1 "Chromium 安装失败"
-  elif command -v dnf >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 Chromium (dnf)...${RES}"
-    dnf install -y chromium || handle_error 1 "Chromium 安装失败"
-  elif command -v pacman >/dev/null 2>&1; then
-    echo -e "${YELLOW_COLOR}正在安装 Chromium (pacman)...${RES}"
-    pacman -S --noconfirm chromium || handle_error 1 "Chromium 安装失败"
-  else
-    echo -e "${RED_COLOR}错误：无法检测包管理器，请手动安装 Chromium${RES}"
-    echo -e "Ubuntu 22.04/24.04: sudo apt-get install -y chromium-browser"
-    echo -e "CentOS/RHEL:       sudo yum install -y chromium"
-    echo -e "Arch Linux:        sudo pacman -S chromium"
-    exit 1
-  fi
-  
-  echo -e "${GREEN_COLOR}✓ Chromium 安装完成${RES}"
 }
 
 CHECK() {
@@ -491,7 +437,6 @@ SHOW_MENU() {
   case "$choice" in
     1)
       INSTALL_PATH='/opt/opsdeck'
-      CHECK_CHROMIUM
       CHECK_OPENCV
       CHECK
       INSTALL
@@ -701,7 +646,6 @@ if [ $# -eq 0 ]; then
     clear
   done
 elif [ "$1" = "install" ]; then
-  CHECK_CHROMIUM
   CHECK_OPENCV
   CHECK
   INSTALL

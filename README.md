@@ -64,7 +64,7 @@ docker-compose up -d
 - curl、tar 命令
 - x86_64 或 arm64 架构
 - **OpenCV 4.6**（验证码识别功能需要）
-- **Chromium 浏览器**（自动化任务需要）
+- **仅建议 Debian 12 / Ubuntu 24.04 直装使用**
 
 
 ### 交互式安装（推荐）
@@ -145,58 +145,60 @@ sudo journalctl -u opsdeck -f
 
 ### 安装系统依赖
 
-使用二进制版本前，需要先安装以下依赖：
+Docker 镜像已内置 OpenCV 运行时依赖；只有直接运行二进制文件时，才需要先安装系统依赖。
 
-#### 安装 Chromium 浏览器
-
-**Ubuntu / Debian:**
+**Ubuntu / Debian（最稳安装，省事优先）:**
 ```bash
-sudo apt-get update && sudo apt-get install -y chromium-browser
+sudo apt-get update
+sudo apt-get install -y libopencv-dev
 ```
 
-**CentOS/RHEL/Fedora:**
+**Debian 12（amd64 / arm64，最精简安装，仅运行时）:**
 ```bash
-sudo yum install -y chromium
-# 或 Fedora
-sudo dnf install -y chromium
+sudo apt-get update
+sudo apt-get install -y \
+  libopencv-core406 \
+  libopencv-imgproc406 \
+  libopencv-imgcodecs406 \
+  libopencv-features2d406 \
+  libopencv-flann406 \
+  libopencv-calib3d406
 ```
 
-**Arch Linux:**
+**Ubuntu 24.04（amd64 / arm64，最精简安装，仅运行时）:**
 ```bash
-sudo pacman -S chromium
+sudo apt-get update
+sudo apt-get install -y \
+  libopencv-core406t64 \
+  libopencv-imgproc406t64 \
+  libopencv-imgcodecs406t64 \
+  libopencv-features2d406t64 \
+  libopencv-flann406t64 \
+  libopencv-calib3d406t64
 ```
 
-#### 安装 OpenCV
-
-**Ubuntu / Debian:**
-```bash
-sudo apt-get install -y libopencv-dev libopencv-contrib-dev
-```
-
-**CentOS/RHEL/Fedora:**
-```bash
-sudo yum install -y opencv opencv-devel
-# 或 Fedora
-sudo dnf install -y opencv opencv-devel
-```
-
-**Arch Linux:**
-```bash
-sudo pacman -S opencv
-```
-
-**macOS:**
+**macOS ARM64:**
 ```bash
 brew install opencv
 ```
 
+除 Debian 12 / Ubuntu 24.04 / macOS ARM64 之外，其它系统版本或架构建议直接使用 Docker 镜像。
+
 ### 快速使用
 
-**Linux/macOS:**
+**Linux:**
 ```bash
 tar -xzf opsdeck-linux-amd64-v1.0.0.tar.gz
 chmod +x opsdeck-linux-amd64-v1.0.0
+ldd ./opsdeck-linux-amd64-v1.0.0
 ./opsdeck-linux-amd64-v1.0.0
+```
+
+**macOS:**
+```bash
+tar -xzf opsdeck-macos-arm64-v1.0.0.tar.gz
+chmod +x opsdeck-macos-arm64-v1.0.0
+./opsdeck-macos-arm64-v1.0.0
 ```
 
 ## ⚙️ 环境变量配置
