@@ -45,6 +45,11 @@ DISTRO_ID=""
 DISTRO_VERSION_ID=""
 SUPPORTED_INSTALL_HOST=false
 
+get_host_description() {
+    local host_desc="${DISTRO_ID:-unknown}${DISTRO_VERSION_ID:+ ${DISTRO_VERSION_ID}}"
+    echo "${host_desc} / ${ARCH}"
+}
+
 # 获取已安装路径
 GET_INSTALLED_PATH() {
     if [ -f "/etc/systemd/system/opsdeck.service" ]; then
@@ -137,9 +142,8 @@ require_supported_install_host() {
     return 0
   fi
 
-  local host_desc="${DISTRO_ID:-unknown}${DISTRO_VERSION_ID:+ ${DISTRO_VERSION_ID}}"
   echo -e "\r\n${RED_COLOR}错误：当前一键安装脚本仅支持 Debian 12 / Ubuntu 24.04 直装${RES}"
-  echo -e "当前系统：${YELLOW_COLOR}${host_desc}${RES}"
+  echo -e "当前系统：${YELLOW_COLOR}$(get_host_description)${RES}"
   echo -e "建议改用 ${GREEN_COLOR}xrbzy/opsdeck${RES} Docker 镜像部署。\r\n"
   exit 1
 }
@@ -267,7 +271,30 @@ get_latest_version() {
     echo "$version"
 }
 
+asset_exists() {
+    local url="$1"
+    curl -fsIL --connect-timeout 10 --retry 2 --retry-delay 2 "$url" >/dev/null 2>&1
+}
+
+get_installed_version() {
+    if [ -f "$INSTALL_PATH/VERSION" ]; then
+        tr -d '\r\n' < "$INSTALL_PATH/VERSION"
+        return 0
+    fi
+    return 1
+}
+
+write_installed_version() {
+    local version="$1"
+    printf "%s\n" "$version" > "$INSTALL_PATH/VERSION" || handle_error 1 "写入版本文件失败"
+}
+
+show_host_info() {
+    echo -e "${GREEN_COLOR}当前系统：${RES} $(get_host_description)"
+}
+
 INSTALL() {
+  show_host_info
   echo -e "${GREEN_COLOR}正在获取最新版本信息...${RES}"
   local version=$(get_latest_version)
   
@@ -279,6 +306,10 @@ INSTALL() {
   
   local filename="opsdeck-linux-${ARCH}-${version}"
   local download_url="${GH_DOWNLOAD_URL}/${filename}"
+
+  if ! asset_exists "$download_url"; then
+    handle_error 1 "发布仓库中未找到当前架构对应的二进制：${filename}"
+  fi
   
   echo -e "\r\n${GREEN_COLOR}下载 OpsDeck ...${RES}"
   if ! download_file "$download_url" "/tmp/opsdeck"; then
@@ -289,6 +320,7 @@ INSTALL() {
   mv /tmp/opsdeck $INSTALL_PATH/opsdeck
 
   if [ -f $INSTALL_PATH/opsdeck ]; then
+    write_installed_version "$version"
     echo -e "${GREEN_COLOR}下载成功，正在安装...${RES}"
   else
     handle_error 1 "安装失败"
@@ -374,15 +406,25 @@ UPDATE() {
         handle_error 1 "未在 $INSTALL_PATH 找到 OpsDeck"
     fi
 
+    show_host_info
     echo -e "${GREEN_COLOR}开始更新 OpsDeck ...${RES}"
 
     local version=$(get_latest_version)
+    local current_version=$(get_installed_version 2>/dev/null || true)
     
     if [ -z "$version" ]; then
         handle_error 1 "无法获取最新版本信息"
     fi
     
     echo -e "${GREEN_COLOR}最新版本: $version${RES}"
+
+    if [ -n "$current_version" ]; then
+        echo -e "${GREEN_COLOR}当前版本: $current_version${RES}"
+        if [ "$current_version" = "$version" ]; then
+            echo -e "${YELLOW_COLOR}当前已是最新版本，无需更新${RES}"
+            return 0
+        fi
+    fi
     
     echo -e "${GREEN_COLOR}停止 OpsDeck 进程${RES}\r\n"
     systemctl stop opsdeck
@@ -391,6 +433,14 @@ UPDATE() {
 
     local filename="opsdeck-linux-${ARCH}-${version}"
     local download_url="${GH_DOWNLOAD_URL}/${filename}"
+
+    if ! asset_exists "$download_url"; then
+        echo -e "${RED_COLOR}发布仓库中未找到当前架构对应的二进制：${filename}${RES}"
+        echo -e "${GREEN_COLOR}正在恢复之前的版本...${RES}"
+        mv /tmp/opsdeck.bak $INSTALL_PATH/opsdeck
+        systemctl start opsdeck
+        exit 1
+    fi
     
     echo -e "${GREEN_COLOR}下载 OpsDeck ...${RES}"
     if ! download_file "$download_url" "/tmp/opsdeck"; then
@@ -405,6 +455,7 @@ UPDATE() {
     mv /tmp/opsdeck $INSTALL_PATH/opsdeck
 
     if [ -f $INSTALL_PATH/opsdeck ]; then
+        write_installed_version "$version"
         echo -e "${GREEN_COLOR}下载成功，正在更新${RES}"
     else
         echo -e "${RED_COLOR}更新失败！${RES}"
@@ -456,6 +507,7 @@ SHOW_MENU() {
   INSTALL_PATH=$(GET_INSTALLED_PATH)
 
   echo -e "\n欢迎使用 OpsDeck 管理脚本\n"
+  echo -e "${GREEN_COLOR}当前环境：${RES} $(get_host_description)"
   echo -e "${GREEN_COLOR}1、安装 OpsDeck${RES}"
   echo -e "${GREEN_COLOR}2、更新 OpsDeck${RES}"
   echo -e "${GREEN_COLOR}3、卸载 OpsDeck${RES}"
@@ -573,8 +625,7 @@ SHOW_MENU() {
       
       # 版本信息
       if [ -f "$INSTALL_PATH/opsdeck" ]; then
-        # 尝试从文件名或GitHub获取版本，如果失败则显示文件修改时间
-        local version=$(get_latest_version 2>/dev/null)
+        local version=$(get_installed_version 2>/dev/null || true)
         if [ -z "$version" ]; then
           local file_date=$(stat -c %y "$INSTALL_PATH/opsdeck" 2>/dev/null | cut -d' ' -f1)
           if [ -z "$file_date" ]; then
