@@ -356,9 +356,10 @@ SUCCESS() {
   echo -e "    局域网：http://${LOCAL_IP}:13113/"
   echo -e "    公网：  http://${PUBLIC_IP}:13113/"
   echo -e ""
-  echo -e "  默认账号："
+  echo -e "  初始账号："
   echo -e "    用户名：admin"
-  echo -e "    密码：  password"
+  echo -e "    密码：  如未预先设置 ADMIN_PASSWORD，则首次启动时会随机生成"
+  echo -e "            请执行 ${GREEN_COLOR}journalctl -u opsdeck -n 50 --no-pager${RES} 查看初始化日志"
   echo -e "════════════════════════════════════════════════════"
   
   echo -e "\n${GREEN_COLOR}启动服务中...${RES}"
