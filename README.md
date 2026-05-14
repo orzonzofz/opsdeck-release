@@ -210,7 +210,6 @@ ADMIN_PASSWORD=your-strong-password
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
-| `ENABLE_ERROR_SCREENSHOT` | `false` | 失败时自动截图 |
 
 ### 示例
 
