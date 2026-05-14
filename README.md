@@ -1,16 +1,14 @@
-# OpsDeck Release - Pre-compiled Binaries
+# OpsDeck Release
 
-预编译的 OpsDeck 二进制文件和 Docker 镜像发布仓库。
+预编译的 OpsDeck 二进制文件与 Docker 镜像发布仓库。
 
-## 🐳 使用 Docker 镜像 (推荐)
+## Docker 运行
 
-### 📝 Docker CLI 直接运行
+### Docker CLI
 
 ```bash
-# 拉取最新镜像
 docker pull xrbzy/opsdeck:latest
 
-# 运行容器
 docker run -d \
   --name opsdeck \
   --init \
@@ -20,14 +18,17 @@ docker run -d \
   --log-opt max-file=7 \
   -v $(pwd)/data:/app/data \
   xrbzy/opsdeck:latest
-
-# 访问应用
-open http://localhost:13113
 ```
 
-### 📝 Docker Compose 配置
+访问：
 
-创建 \`docker-compose.yml\`：
+```bash
+http://localhost:13113
+```
+
+### Docker Compose
+
+创建 `docker-compose.yml`：
 
 ```yaml
 services:
@@ -47,114 +48,72 @@ services:
     restart: unless-stopped
 ```
 
-运行：
+启动：
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-## 🚀 Linux 一键安装脚本
+## Linux 一键安装脚本
 
-适用于 Linux 系统的自动化安装脚本，支持 systemd 服务管理。
+适用于 Linux 系统的自动化安装脚本，支持 systemd 服务管理。  
 当前仅支持 `Debian 12` 和 `Ubuntu 24.04` 直装；其它系统版本或架构建议直接使用 Docker。
 
 ### 系统要求
 
 - Linux 系统（支持 systemd）
 - Root 权限
-- curl、tar 命令
-- x86_64 或 arm64 架构
-- **OpenCV 4.6**（验证码识别功能需要）
-- **仅建议 Debian 12 / Ubuntu 24.04 直装使用**
+- `curl`、`tar`
+- `x86_64` 或 `arm64`
+- OpenCV 4.6 运行时依赖
 
-
-### 交互式安装（推荐）
+### 交互式安装
 
 ```bash
-# 下载脚本
 curl -O https://raw.githubusercontent.com/orzonzofz/opsdeck-release/main/opsdeck.sh
 chmod +x opsdeck.sh
-
-# 运行交互式菜单
 sudo ./opsdeck.sh
 ```
 
-交互菜单功能：
-- 1、安装 OpsDeck
-- 2、更新 OpsDeck
-- 3、卸载 OpsDeck
-- 4、查看运行状态
-- 5、启动 OpsDeck
-- 6、停止 OpsDeck
-- 7、重启 OpsDeck
-- 8、查看实时日志
-
-### 命令行快速安装
+### 命令行安装
 
 ```bash
-# 安装到默认路径 /opt/opsdeck
 sudo ./opsdeck.sh install
-
-# 安装到自定义路径
-sudo ./opsdeck.sh install /usr/local
-
-# 更新到最新版本
 sudo ./opsdeck.sh update
-
-# 卸载
 sudo ./opsdeck.sh uninstall
 ```
 
-### 安装后访问
-
-脚本会自动显示访问地址：
-- 局域网：`http://your-local-ip:13113/`
-- 公网：`http://your-public-ip:13113/`
-
-默认账号：
-- 用户名：`admin`
-- 密码：`password`
-
 ### 服务管理
 
-安装后会自动创建 systemd 服务，可使用以下命令管理：
-
 ```bash
-# 查看状态
 sudo systemctl status opsdeck
-
-# 启动服务
 sudo systemctl start opsdeck
-
-# 停止服务
 sudo systemctl stop opsdeck
-
-# 重启服务
 sudo systemctl restart opsdeck
-
-# 查看日志
 sudo journalctl -u opsdeck -f
 ```
 
-## 💾 下载预编译二进制
+## 预编译二进制
 
-在 [Releases](https://github.com/orzonzofz/opsdeck-release/releases) 页面下载:
+在 [Releases](https://github.com/orzonzofz/opsdeck-release/releases) 页面下载：
 
-- `opsdeck-linux-amd64-vX.X.X.tar.gz` - Linux x86_64
-- `opsdeck-linux-arm64-vX.X.X.tar.gz` - Linux ARM64
-- `opsdeck-macos-arm64-vX.X.X.tar.gz` - macOS Apple Silicon
+- `opsdeck-linux-amd64-vX.X.X.tar.gz`
+- `opsdeck-linux-arm64-vX.X.X.tar.gz`
+- `opsdeck-macos-arm64-vX.X.X.tar.gz`
 
-### 安装系统依赖
+### 运行时依赖
 
-Docker 镜像已内置 OpenCV 运行时依赖；只有直接运行二进制文件时，才需要先安装系统依赖。
+Docker 镜像已内置运行时依赖；只有直接运行二进制文件时，才需要先安装系统依赖。
 
-**Ubuntu / Debian（最稳安装，省事优先）:**
+**Ubuntu / Debian（最稳安装）**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y libopencv-dev
 ```
 
-**Debian 12（amd64 / arm64，最精简安装，仅运行时）:**
+**Debian 12（最精简运行时）**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y \
@@ -166,7 +125,8 @@ sudo apt-get install -y \
   libopencv-calib3d406
 ```
 
-**Ubuntu 24.04（amd64 / arm64，最精简安装，仅运行时）:**
+**Ubuntu 24.04（最精简运行时）**
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y \
@@ -178,111 +138,92 @@ sudo apt-get install -y \
   libopencv-calib3d406t64
 ```
 
-**macOS ARM64:**
+**macOS ARM64**
+
 ```bash
 brew install opencv
 ```
 
-除 Debian 12 / Ubuntu 24.04 / macOS ARM64 之外，其它系统版本或架构建议直接使用 Docker 镜像。
+除 Debian 12 / Ubuntu 24.04 / macOS ARM64 外，其它系统版本或架构建议直接使用 Docker。
 
-### 快速使用
+### 快速启动
 
-**Linux:**
+**Linux**
+
 ```bash
 tar -xzf opsdeck-linux-amd64-v1.0.0.tar.gz
 chmod +x opsdeck-linux-amd64-v1.0.0
-ldd ./opsdeck-linux-amd64-v1.0.0
 ./opsdeck-linux-amd64-v1.0.0
 ```
 
-**macOS:**
+**macOS**
+
 ```bash
 tar -xzf opsdeck-macos-arm64-v1.0.0.tar.gz
 chmod +x opsdeck-macos-arm64-v1.0.0
 ./opsdeck-macos-arm64-v1.0.0
 ```
 
-## ⚙️ 环境变量配置
+## 首次启动说明
 
-所有配置都是可选的，不设置时会使用默认值。可以通过 `.env` 文件或环境变量进行配置。
+- 首次启动会自动创建管理员账号
+- 默认用户名是 `admin`
+- 如果没有设置 `ADMIN_PASSWORD`，程序会生成一次随机密码并写入数据库
+- 随机密码会在首次初始化日志中输出
+- 后续再次重启时，会优先使用数据库里已经保存的管理员账号配置
 
-### 服务器配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `PORT` | 13113 | 服务器监听端口 |
-
-### 数据库配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `DATABASE_URL` | sqlite:./data/database.db?mode=rwc | 数据库连接地址 |
-
-### JWT 密钥配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `JWT_SECRET` | your-secret-key-change-in-production | JWT加密密钥，**生产环境务必更改！** |
-
-### 默认管理员账号
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `ADMIN_USERNAME` | admin | 管理员用户名（首次运行时创建） |
-| `ADMIN_PASSWORD` | password | 管理员密码（首次运行时创建） |
-
-> 💡 如果设置了环境变量，首次创建时会使用环境变量的值保存到数据库
-
-### 日志配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `RUST_LOG` | info | 日志级别：trace, debug, info, warn, error |
-
-> 💡 详细的日志配置，例如：`opsdeck=info,sqlx=warn,tower_http=warn` 
-
-### 浏览器配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `CHROME_PATH` | - | 浏览器路径（可选）<br>• 不设置时会自动检查系统是否安装浏览器，没有就下载 Chromium<br>• 也可以手动指定系统浏览器路径 |
-| `BROWSER_HEADLESS` | true | 浏览器模式<br>• true: 无头模式（后台运行，默认）<br>• false: 有头模式（显示窗口，用于调试） |
-| `BROWSER_ENABLE_IMAGES` | false | 图片加载<br>• true: 启用图片<br>• false: 禁用图片（默认，可提高性能） |
-| `BROWSER_WINDOW_WIDTH` | 1440 | 窗口宽度（有头模式时生效） |
-| `BROWSER_WINDOW_HEIGHT` | 900 | 窗口高度（有头模式时生效） |
-| `BROWSER_VIEWPORT_WIDTH` | 1440 | 视口宽度（网页显示区域） |
-| `BROWSER_VIEWPORT_HEIGHT` | 900 | 视口高度（网页显示区域） |
-| `MAX_CONCURRENT_BROWSERS` | 5 | 浏览器最大并发数（同时运行的实例数量） |
-
-### 示例配置文件
-
-创建 `.env` 文件：
+如果你想指定初始密码，建议在首次启动前设置环境变量：
 
 ```bash
-# 服务器配置
-PORT=13113
-
-# 数据库配置
-DATABASE_URL=sqlite:./data/database.db?mode=rwc
-
-# JWT 密钥（生产环境务必更改！）
-JWT_SECRET=your-strong-secret-key-here
-
-# 管理员账号
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=your-secure-password
+ADMIN_PASSWORD=your-strong-password
+```
 
-# 日志级别
+## 环境变量
+
+所有配置均为可选项，不设置时会使用默认值。
+
+### 基础配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `PORT` | `13113` | 服务监听端口 |
+| `DATABASE_URL` | `sqlite:./data/database.db?mode=rwc` | 数据库连接地址 |
+| `RUST_LOG` | `opsdeck=info,sqlx=warn,tower_http=warn` | 日志级别 |
+
+### 管理员初始化
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `ADMIN_USERNAME` | `admin` | 仅在数据库还没有管理员配置时生效 |
+| `ADMIN_PASSWORD` | 未设置 | 仅在数据库还没有管理员配置时生效；不设置则首次启动随机生成 |
+| `ADMIN_SESSION_COOKIE_SECURE` | `true` | 后台登录 Cookie 默认开启 `Secure`；仅显式设置为 `false` 才关闭 |
+
+### 授权配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `LICENSE_KEY` | 未设置 | 可选；不设置时可在前端后台填写 |
+
+### 其他配置
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `ENABLE_ERROR_SCREENSHOT` | `false` | 失败时自动截图 |
+
+### 示例
+
+```bash
+PORT=13113
+DATABASE_URL=sqlite:./data/database.db?mode=rwc
 RUST_LOG=opsdeck=info,sqlx=warn,tower_http=warn
 
-# 浏览器配置
-BROWSER_HEADLESS=true
-BROWSER_ENABLE_IMAGES=false
-MAX_CONCURRENT_BROWSERS=5
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your-strong-password
 
 ```
 
-## 🆘 获取帮助
+## 获取帮助
 
-- 问题反馈: [Issues](https://github.com/orzonzofz/opsdeck-release/issues)
-- 详细文档: 见各版本 Release 说明
+- 问题反馈：[Issues](https://github.com/orzonzofz/opsdeck-release/issues)
+- 版本说明：见各版本 Release 页面
