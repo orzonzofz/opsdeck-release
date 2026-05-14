@@ -58,6 +58,7 @@ docker compose up -d
 
 适用于 Linux 系统的自动化安装脚本，支持 systemd 服务管理。  
 当前仅支持 `Debian 12` 和 `Ubuntu 24.04` 直装；其它系统版本或架构建议直接使用 Docker。
+脚本会在安装和更新前自动校验当前系统、CPU 架构以及对应 Release 资产是否存在。
 
 ### 系统要求
 
