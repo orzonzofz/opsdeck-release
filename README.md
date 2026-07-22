@@ -165,21 +165,6 @@ chmod +x opsdeck-macos-arm64-v1.0.0
 ./opsdeck-macos-arm64-v1.0.0
 ```
 
-## 首次启动说明
-
-- 首次启动会自动创建管理员账号
-- 默认用户名是 `admin`
-- 如果没有设置 `ADMIN_PASSWORD`，程序会生成一次随机密码并写入数据库
-- 随机密码会在首次初始化日志中输出
-- 后续再次重启时，会优先使用数据库里已经保存的管理员账号配置
-
-如果你想指定初始密码，建议在首次启动前设置环境变量：
-
-```bash
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=your-strong-password
-```
-
 ## 环境变量
 
 所有配置均为可选项，不设置时会使用默认值。
@@ -192,24 +177,6 @@ ADMIN_PASSWORD=your-strong-password
 | `DATABASE_URL` | `sqlite:./data/database.db?mode=rwc` | 数据库连接地址 |
 | `RUST_LOG` | `opsdeck=info,sqlx=warn,tower_http=warn` | 日志级别 |
 
-### 管理员初始化
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `ADMIN_USERNAME` | `admin` | 仅在数据库还没有管理员配置时生效 |
-| `ADMIN_PASSWORD` | 未设置 | 仅在数据库还没有管理员配置时生效；不设置则首次启动随机生成 |
-| `ADMIN_SESSION_COOKIE_SECURE` | `true` | 后台登录 Cookie 默认开启 `Secure`；仅显式设置为 `false` 才关闭 |
-
-### 授权配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `LICENSE_KEY` | 未设置 | 可选；不设置时可在前端后台填写 |
-
-### 其他配置
-
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
 
 ### 示例
 
@@ -217,9 +184,6 @@ ADMIN_PASSWORD=your-strong-password
 PORT=13113
 DATABASE_URL=sqlite:./data/database.db?mode=rwc
 RUST_LOG=opsdeck=info,sqlx=warn,tower_http=warn
-
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=your-strong-password
 
 ```
 
